@@ -1,4 +1,4 @@
-/* rahthah.js - Select2-like Island Dropdown Library (Vanilla JS) */
+/* rahthah.js - Island Dropdown Library */
 (function(global) {
   const islands = [
     "Sh. Funadhoo","Sh. Kanditheemu","Sh. Noomaraa","Sh. Goidhoo","Sh. Feydhoo","Sh. Feevah",
@@ -34,138 +34,31 @@
     "S. Maradhoo","S. Maradhoo-Feydhoo","S. Feydhoo","S. Hulhumeedhoo","GMR. Vilimalé","GMR. Malé","GMR. Hulhumalé"
   ];
 
-  function createDropdown(select) {
-    // Hide original select
-    select.style.display = 'none';
-    select.tabIndex = -1;
-
-    // Container
-    const container = document.createElement('div');
-    container.classList.add('rahthah-dropdown');
-    container.style.position = 'relative';
-    select.parentNode.insertBefore(container, select);
-    container.appendChild(select);
-
-    // Selected box
-    const selected = document.createElement('div');
-    selected.classList.add('rahthah-selected');
-    selected.textContent = 'Select Island';
-    selected.tabIndex = 0;
-    selected.style.padding = '6px 10px';
-    selected.style.border = '1px solid #ccc';
-    selected.style.borderRadius = '4px';
-    selected.style.cursor = 'pointer';
-    container.appendChild(selected);
-
-    // Dropdown list
-    const list = document.createElement('div');
-    list.classList.add('rahthah-list');
-    list.style.position = 'absolute';
-    list.style.top = '100%';
-    list.style.left = 0;
-    list.style.right = 0;
-    list.style.border = '1px solid #ccc';
-    list.style.borderRadius = '4px';
-    list.style.background = '#fff';
-    list.style.maxHeight = '200px';
-    list.style.overflowY = 'auto';
-    list.style.display = 'none';
-    list.style.zIndex = 9999;
-    container.appendChild(list);
-
-    // Search input
-    const search = document.createElement('input');
-    search.type = 'text';
-    search.placeholder = 'Search...';
-    search.style.width = '100%';
-    search.style.boxSizing = 'border-box';
-    search.style.padding = '6px 10px';
-    search.style.border = 'none';
-    search.style.borderBottom = '1px solid #ddd';
-    list.appendChild(search);
-
-    // Options container
-    const optionsContainer = document.createElement('div');
-    list.appendChild(optionsContainer);
-
-    function renderOptions(filter = '') {
-      optionsContainer.innerHTML = '';
-      islands
-        .filter(i => i.toLowerCase().includes(filter.toLowerCase()))
-        .forEach(i => {
-          const option = document.createElement('div');
-          option.textContent = i;
-          option.style.padding = '6px 10px';
-          option.style.cursor = 'pointer';
-          option.addEventListener('click', () => {
-            selected.textContent = i;
-            select.value = i;
-            list.style.display = 'none';
-          });
-          option.addEventListener('mouseenter', () => option.style.background = '#f0f0f0');
-          option.addEventListener('mouseleave', () => option.style.background = '#fff');
-          optionsContainer.appendChild(option);
-        });
-    }
-
-    renderOptions();
-
-    // Toggle dropdown
-    selected.addEventListener('click', () => {
-      list.style.display = list.style.display === 'none' ? 'block' : 'none';
-      search.focus();
-    });
-
-    // Filter on input
-    search.addEventListener('input', () => {
-      renderOptions(search.value);
-    });
-
-    // Close dropdown on click outside
-    document.addEventListener('click', e => {
-      if (!container.contains(e.target)) list.style.display = 'none';
-    });
-
-    // Keyboard navigation
-    let index = -1;
-    search.addEventListener('keydown', e => {
-      const options = Array.from(optionsContainer.children);
-      if (!options.length) return;
-      if (e.key === 'ArrowDown') {
-        index = (index + 1) % options.length;
-        options.forEach(o => o.style.background = '#fff');
-        options[index].style.background = '#f0f0f0';
-      } else if (e.key === 'ArrowUp') {
-        index = (index - 1 + options.length) % options.length;
-        options.forEach(o => o.style.background = '#fff');
-        options[index].style.background = '#f0f0f0';
-      } else if (e.key === 'Enter') {
-        e.preventDefault();
-        if (index >= 0 && options[index]) {
-          options[index].click();
-          index = -1;
-        }
-      } else if (e.key === 'Escape') {
-        list.style.display = 'none';
-      }
-    });
-  }
-
+  // Auto-populate all <select> with class "rahthah"
   function populate() {
     const selects = document.querySelectorAll('select.rahthah');
     selects.forEach(select => {
-      // Add placeholder option
       select.innerHTML = '';
       const placeholder = document.createElement('option');
       placeholder.value = '';
       placeholder.textContent = 'Select Island';
       select.appendChild(placeholder);
 
-      createDropdown(select);
+      islands.forEach(island => {
+        const option = document.createElement('option');
+        option.value = island;
+        option.textContent = island;
+        select.appendChild(option);
+      });
     });
   }
 
+  // Auto-run on DOMContentLoaded
   document.addEventListener('DOMContentLoaded', populate);
 
-  global.rahthah = { islands, populate };
+  // Expose to global namespace
+  global.rahthah = {
+    islands,
+    populate
+  };
 })(window);
