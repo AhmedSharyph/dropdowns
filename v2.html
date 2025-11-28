@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Funadhoo – Beneficiary Form</title>
+
+<!-- Tailwind CSS (for styling) -->
+<script src="https://cdn.tailwindcss.com"></script>
+
+<!-- jQuery (required for Select2) -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<!-- Select2 CSS & JS -->
+<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+
+<!-- Rahthah & Marukazu Libraries -->
+<script src="https://cdn.jsdelivr.net/gh/ahmedsharyph/dropdowns@main/rahthah.js"></script>
+<script src="https://cdn.jsdelivr.net/gh/ahmedsharyph/dropdowns@main/marukazu.js"></script>
+
+<style>
+/* Modal animations */
+.show-modal { opacity: 1 !important; }
+.show-modal > div { transform: scale(1) !important; }
+</style>
+</head>
+<body class="bg-gray-100 p-6">
+
+<div class="max-w-2xl mx-auto bg-white shadow rounded-lg p-6">
+  <h2 class="text-2xl font-bold mb-6 text-gray-700">Funadhoo – Beneficiary Form</h2>
+
+  <form id="funadhooForm" class="space-y-4">
+    <!-- Currently Living -->
+    <div>
+      <label for="currently_living" class="block font-medium mb-1">Currently Living</label>
+      <select id="currently_living" class="rahthah w-full border rounded px-3 py-2" required></select>
+    </div>
+
+    <!-- EIR ID -->
+    <div>
+      <label for="eir_id" class="block font-medium mb-1">EIR ID</label>
+      <input id="eir_id" name="eir_id" type="text" class="w-full border rounded px-3 py-2" placeholder="EIR ID">
+    </div>
+
+    <!-- Beneficiary Name -->
+    <div>
+      <label for="beneficiary_name" class="block font-medium mb-1">Beneficiary Name</label>
+      <input id="beneficiary_name" name="beneficiary_name" type="text" class="w-full border rounded px-3 py-2" placeholder="Full Name" required>
+    </div>
+
+    <!-- Foolhumaa Form Number -->
+    <div>
+      <label for="foolhumaa_form_number" class="block font-medium mb-1">Foolhumaa Form Number</label>
+      <input id="foolhumaa_form_number" name="foolhumaa_form_number" type="text" class="w-full border rounded px-3 py-2" placeholder="FFN">
+    </div>
+
+    <!-- Beneficiary National ID -->
+    <div>
+      <label for="beneficiary_national_id" class="block font-medium mb-1">Beneficiary National ID</label>
+      <input id="beneficiary_national_id" name="beneficiary_national_id" type="text" class="w-full border rounded px-3 py-2" placeholder="National ID">
+    </div>
+
+   <div class="flex gap-4">
+  <!-- Date of Birth -->
+  <div class="flex-1">
+    <label for="dob" class="block font-medium mb-1">Date of Birth</label>
+    <input id="dob" name="dob" type="text" class="custom-date w-full border rounded px-3 py-2" required>
+  </div>
+
+  <!-- Age -->
+  <div class="flex-1">
+    <label for="age" class="block font-medium mb-1">Age</label>
+    <input id="age" name="age" type="text" class="w-full border rounded px-3 py-2 bg-gray-100" readonly>
+  </div>
+</div>
+
+    <!-- Sex -->
+    <div>
+      <label for="sex" class="block font-medium mb-1">Sex</label>
+      <select id="sex" name="sex" class="w-full border rounded px-3 py-2" required>
+        <option value="">Select</option>
+        <option value="Male">Male</option>
+        <option value="Female">Female</option>
+      </select>
+    </div>
+
+    <!-- Atoll/Island of Residence -->
+    <div>
+      <label for="atoll_island_residence" class="block font-medium mb-1">Atoll / Island of Residence</label>
+      <select id="atoll_island_residence" class="rahthah w-full border rounded px-3 py-2" required></select>
+    </div>
+
+    <!-- Birth Facility -->
+    <div>
+      <label for="birth_facility" class="block font-medium mb-1">Birth Facility</label>
+      <select id="birth_facility" class="marukazu w-full border rounded px-3 py-2" required></select>
+    </div>
+
+    <!-- Submit Button -->
+    <button id="submitBtn" type="button" class="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700 flex items-center justify-center space-x-2">
+      <span>Submit Form</span>
+      <svg id="spinner" class="animate-spin h-5 w-5 text-white hidden" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path>
+      </svg>
+    </button>
+  </form>
+</div>
+
+<!-- SUCCESS MODAL -->
+<div id="successModal" class="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center hidden z-50 opacity-0 transition-opacity duration-300">
+  <div class="bg-white rounded-xl shadow-xl p-6 w-80 text-center transform scale-95 transition-transform duration-300">
+    <h2 class="text-xl font-semibold text-green-600">✔ Submission Successful</h2>
+    <p class="mt-2 text-gray-600">Your form has been saved.</p>
+  </div>
+</div>
+
+<script>
+$(document).ready(function() {
+  // --- Initialize Select2 after dropdowns are filled ---
+  function initRahthah() {
+    if ($('#currently_living option').length > 0 && $('#atoll_island_residence option').length > 0) {
+      $('#currently_living, #atoll_island_residence').select2({
+        placeholder: "Select Island",
+        allowClear: true,
+        width: '100%'
+      });
+    } else setTimeout(initRahthah, 50);
+  }
+  initRahthah();
+
+  function initMarukazu() {
+    if ($('#birth_facility option').length > 0) {
+      $('#birth_facility').select2({
+        placeholder: "Select Birth Facility",
+        allowClear: true,
+        width: '100%'
+      });
+    } else setTimeout(initMarukazu, 50);
+  }
+  initMarukazu();
+
+  $('#sex').select2({
+    placeholder: "Select Sex",
+    allowClear: true,
+    width: '100%'
+  });
+
+  // --- Age calculation ---
+  $('#dob').on('change', function() {
+    const dob = new Date(this.value);
+    const today = new Date();
+    let years = today.getFullYear() - dob.getFullYear();
+    let months = today.getMonth() - dob.getMonth();
+    let days = today.getDate() - dob.getDate();
+    if (days < 0) { months--; days += new Date(today.getFullYear(), today.getMonth(), 0).getDate(); }
+    if (months < 0) { years--; months += 12; }
+    let ageText = (years === 0 && months === 0) ? `${days}D` :
+                  (years === 0) ? `${months}M ${days}D` :
+                  `${years}Y ${months}M`;
+    $('#age').val(ageText);
+  });
+
+  // --- Form submission ---
+  $('#submitBtn').on('click', function() {
+    const form = $('#funadhooForm')[0];
+    const btn = $(this);
+    const spinner = $('#spinner');
+    const modal = $('#successModal');
+
+    // Simple validation
+    if (!$('#currently_living').val() || !$('#sex').val() || !$('#atoll_island_residence').val()) {
+      alert('Please fill all required fields.');
+      return;
+    }
+
+    btn.prop('disabled', true);
+    spinner.removeClass('hidden');
+
+    const data = new URLSearchParams(new FormData(form));
+    data.append('facility', 'Funadhoo');
+
+    fetch('https://script.google.com/macros/s/YOUR_SCRIPT_ID/exec', { method: 'POST', body: data })
+      .finally(() => {
+        spinner.addClass('hidden');
+        btn.prop('disabled', false);
+
+        modal.removeClass('hidden');
+        setTimeout(() => modal.addClass('show-modal'), 10);
+
+        form.reset();
+        $('#currently_living, #sex, #atoll_island_residence, #birth_facility').val(null).trigger('change');
+
+        setTimeout(() => {
+          modal.removeClass('show-modal');
+          setTimeout(() => modal.addClass('hidden'), 300);
+          window.location.href = '/';
+        }, 1500);
+      });
+  });
+});
+</script>
+
+</body>
+</html>
